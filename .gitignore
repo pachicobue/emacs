@@ -1,2 +1,4 @@
-local
-site_lisp
+local/
+site_lisp/
+elpa/
+auto-save-list/
