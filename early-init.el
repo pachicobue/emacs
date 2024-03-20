@@ -2,27 +2,19 @@
 ;;; Commentary:
 ;;
 ;; Emacs 27+ introduces early-init.el, which is run before init.el,
-;; before package and UI initialization happens.
-;; - Define build option
-;; - System settings
-;; - Speedup for startup process
 ;;
 ;;; Code:
 
-;; [Option] Switch init mode.
-(defconst opt/debug-p nil
-  "If non-nil, make starup verbose.")
-(defconst opt/enable-profile-p nil
-  "If non-nil, enable profile.")
+;; File Path
+(defconst my/base-directory user-emacs-directory)
+(defconst my/early-init-file (expand-file-name "early-init.el" my/base-directory))
+(defconst my/init-file (expand-file-name "init.el" my/base-directory))
+(defconst my/leaf-db-file (expand-file-name "leaf-db.el" my/base-directory))
+(defconst my/local-file-directory (expand-file-name "local/" my/base-directory))
 
-;; [Setting] Set output directory.
-(setq user-emacs-directory (expand-file-name "local/" user-emacs-directory))
-(custom-set-variables '(custom-file (expand-file-name "custom.el" user-emacs-directory)))
-
-;; Turn on debug info.
-(when opt/debug-p
-  (setq init-file-debug t)
-  (setq debug-on-error t))
+;; To keep .config/emacs clean
+(setq auto-save-list-file-prefix nil)
+(setq user-emacs-directory my/local-file-directory)
 
 ;; Suppress GC during startup process.
 ;; Make sure to reset this.
@@ -44,11 +36,6 @@
 
 ;; Newer .el is prior to old .elc
 (setq load-prefer-newer t)
-
-;; Disable frame content here
-(push '(cursor-type . bar) default-frame-alist)
-(push '(menu-bar-lines . 0) default-frame-alist)
-(push '(tool-bar-lines . 0) default-frame-alist)
 
 (provide 'early-init.el)
 ;;; early-init.el ends here
