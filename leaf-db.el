@@ -123,8 +123,7 @@
              (dashboard-vertically-center-content . t)
              (dashboard-items quote
                               ((projects . 5)
-                               (recents . 5)
-                               (bookmarks . 5)))
+                               (recents . 5)))
              (dashboard-display-icons-p . t)
              (dashboard-ison-type quote nerd-icons))
     :config
@@ -274,19 +273,9 @@
              (acm-enable-icon . t)
              (acm-enable-copilot)
              (acm-enable-preview . t)
-             (acm-enable-yas)
-             (acm-enable-tempel)
+             (acm-enable-yas . t)
              (acm-backend-search-file-words)
              (acm-backend-lsp-enable-auto-import)))
-
-  (leaf magit
-    :doc "A Git porcelain inside Emacs"
-    :req "emacs-25.1" "dash-2.19.1" "git-commit-3.3.0" "magit-section-3.3.0" "transient-0.3.6" "with-editor-3.0.5"
-    :tag "vc" "tools" "git" "emacs>=25.1"
-    :url "https://github.com/magit/magit"
-    :added "2024-03-20"
-    :emacs>= 25.1
-    :straight t)
 
   (leaf marginalia
     :doc "Enrich existing commands with completion annotations"
@@ -372,13 +361,6 @@
              (completion-category-defaults)
              (completion-category-overrides)))
 
-  (leaf perfect-margin
-    :tag "out-of-MELPA"
-    :added "2024-03-24"
-    :straight t
-    :custom ((perfect-margin-only-set-left-margin . t))
-    :global-minor-mode t)
-
   (leaf recentf
     :doc "keep track of recently opened files"
     :tag "builtin"
@@ -410,51 +392,6 @@
     :straight t
     :custom (smooth-scroll/vscroll-step-size . 10)
     :global-minor-mode smooth-scroll-mode)
-
-  (leaf treemacs
-    :doc "A tree style file explorer package"
-    :req "emacs-26.1" "cl-lib-0.5" "dash-2.11.0" "s-1.12.0" "ace-window-0.9.0" "pfuture-1.7" "hydra-0.13.2" "ht-2.2" "cfrs-1.3.2"
-    :tag "out-of-MELPA" "emacs>=26.1"
-    :url "https://github.com/Alexander-Miller/treemacs"
-    :added "2024-03-20"
-    :emacs>= 26.1
-    :require t
-    :straight t
-    :custom ((treemacs-follow-mode . t)
-             (treemacs-width . 0.2)))
-
-  (leaf treemacs-evil
-    :doc "Evil mode integration for treemacs"
-    :req "emacs-26.1" "evil-1.2.12" "treemacs-0.0"
-    :tag "out-of-MELPA" "emacs>=26.1"
-    :url "https://github.com/Alexander-Miller/treemacs"
-    :added "2024-03-20"
-    :emacs>= 26.1
-    :after evil treemacs
-    :require t
-    :straight t)
-
-  (leaf treemacs-icons-dired
-    :doc "Treemacs icons for dired"
-    :req "treemacs-0.0" "emacs-26.1"
-    :tag "out-of-MELPA" "emacs>=26.1"
-    :url "https://github.com/Alexander-Miller/treemacs"
-    :added "2024-03-20"
-    :emacs>= 26.1
-    :after treemacs
-    :require t
-    :straight t)
-
-  (leaf treemacs-magit
-    :doc "Magit integration for treemacs"
-    :req "emacs-26.1" "treemacs-0.0" "pfuture-1.3" "magit-2.90.0"
-    :tag "out-of-MELPA" "emacs>=26.1"
-    :url "https://github.com/Alexander-Miller/treemacs"
-    :added "2024-03-20"
-    :emacs>= 26.1
-    :after treemacs magit
-    :require t
-    :straight t)
 
   (leaf treesit
     :doc "tree-sitter utilities"
@@ -499,40 +436,6 @@
     :custom (vertico-preselect quote prompt)
     :global-minor-mode t)
 
-  (leaf vterm
-    :doc "Fully-featured terminal emulator"
-    :req "emacs-25.1"
-    :tag "out-of-MELPA" "terminals" "emacs>=25.1"
-    :url "https://github.com/akermu/emacs-libvterm"
-    :added "2024-03-20"
-    :emacs>= 25.1
-    :require t
-    :straight t
-    :custom ((vterm-max-scrollback . 10000)
-             (vterm-timer-delay . 0.01)
-             (vterm-buffer-name-string . "vterm %s")))
-
-  (leaf vterm-toggle
-    :doc "Toggles between the vterm buffer and other buffers."
-    :req "emacs-25.1" "vterm-0.0.1"
-    :tag "out-of-MELPA" "terminals" "vterm" "emacs>=25.1"
-    :url "https://github.com/jixiuf/vterm-toggle"
-    :added "2024-03-20"
-    :emacs>= 25.1
-    :after vterm
-    :require t
-    :straight t
-    :custom ((vterm-toggle-scope quote project))
-    :config
-    (add-to-list 'display-buffer-alist
-                 '((lambda (bufname _)
-                     (with-current-buffer bufname
-                       (equal major-mode 'vterm-mode)))
-                   (display-buffer-reuse-window display-buffer-in-direction)
-                   (direction . bottom)
-                   (reusable-frames . visible)
-                   (window-height . 0.3))))
-
   (leaf vundo
     :doc "Visual undo tree"
     :req "emacs-28.1"
@@ -560,9 +463,8 @@
     :added "2024-03-23"
     :emacs>= 24.4
     :straight t
-    :require t))
-
-
+    :require t
+    :global-minor-mode yas-global-mode))
 
 (provide 'leaf-db)
 
