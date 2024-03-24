@@ -137,6 +137,13 @@
     :custom (display-line-numbers-width . 4)
     :global-minor-mode global-display-line-numbers-mode)
 
+  (leaf eaf
+    :tag "out-of-MELPA"
+    :added "2024-03-24"
+    :straight (eaf :type git :host github :repo "manateelazycat/emacs-application-framework" :files
+                   ("*.el" "*.py" "core" "app" "*.json"))
+    :require (eaf eaf-browser eaf-markdown-previewer eaf-pdf-viewer eaf-image-viewer eaf-git eaf-pyqterminal eaf-org-previewer eaf-file-manager eaf-jupyter))
+
   (leaf embark
     :doc "Conveniently act on minibuffer completions"
     :req "emacs-27.1" "compat-29.1.4.0"
