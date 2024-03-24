@@ -63,6 +63,9 @@
     (defun my/centaur-tabs-buffer-groups-function nil
       (list
        (cond
+        ((string-equal "*dashboard*"
+                       (buffer-name))
+         "DashBoard")
         ((string-equal "*"
                        (substring
                         (buffer-name)
@@ -82,8 +85,6 @@
              (centaur-tabs-set-modified-marker . t)
              (centaur-tabs-cycle-scope quote tabs)
              (centaur-tabs-buffer-groups-function function my/centaur-tabs-buffer-groups-function))
-    :config
-    (centaur-tabs-headline-match)
     :global-minor-mode t)
 
   (leaf consult
@@ -103,36 +104,31 @@
     :added "2024-03-20"
     :emacs>= 27.2
     :require t
+    :init
+    (defun my/copilot-tab nil
+      (interactive)
+      (or
+       (copilot-accept-completion)
+       (indent-for-tab-command)))
+
     :straight (copilot :type git :host github :repo "copilot-emacs/copilot.el")
     :hook (prog-mode-hook . copilot-mode)
     :custom (copilot-indent-offset-warning-disable . t))
 
-  (leaf corfu
-    :doc "COmpletion in Region FUnction"
-    :req "emacs-27.1" "compat-29.1.4.4"
-    :tag "text" "completion" "matching" "convenience" "abbrev" "emacs>=27.1"
-    :url "https://github.com/minad/corfu"
-    :added "2024-03-20"
-    :emacs>= 27.1
+  (leaf dashboard
+    :tag "out-of-MELPA"
+    :added "2024-03-24"
     :straight t
-    :custom ((corfu-cycle . t)
-             (corfu-auto . t)
-             (corfu-auto-delay . 0)
-             (corfu-auto-prefix . 2)
-             (corfu-quit-no-match . t)
-             (corfu-preselect quote prompt))
-    :global-minor-mode global-corfu-mode)
-
-  (leaf dirvish
-    :doc "A modern file manager based on dired mode"
-    :req "emacs-27.1" "transient-0.3.7"
-    :tag "out-of-MELPA" "convenience" "files" "emacs>=27.1"
-    :url "https://github.com/alexluigit/dirvish"
-    :added "2024-03-20"
-    :emacs>= 27.1
-    :require t
-    :straight t
-    :global-minor-mode dirvish-override-dired-mode)
+    :custom ((dashboard-center-content . t)
+             (dashboard-vertically-center-content . t)
+             (dashboard-items quote
+                              ((projects . 5)
+                               (recents . 5)
+                               (bookmarks . 5)))
+             (dashboard-display-icons-p . t)
+             (dashboard-ison-type quote nerd-icons))
+    :config
+    (dashboard-setup-startup-hook))
 
   (leaf display-line-numbers
     :doc "interface for display-line-numbers"
@@ -140,18 +136,6 @@
     :added "2024-03-20"
     :custom (display-line-numbers-width . 4)
     :global-minor-mode global-display-line-numbers-mode)
-
-  (leaf eglot
-    :doc "The Emacs Client for LSP servers"
-    :tag "builtin"
-    :added "2024-03-20"
-    :hook (c-common-mode-hook . eglot-ensure))
-
-  (leaf electric
-    :doc "window maker and Command loop for `electric' modes"
-    :tag "builtin"
-    :added "2024-03-21"
-    :global-minor-mode electric-pair-mode)
 
   (leaf embark
     :doc "Conveniently act on minibuffer completions"
@@ -177,9 +161,9 @@
     :tag "vim" "emulation"
     :url "https://github.com/emacs-evil/evil"
     :added "2024-03-20"
+    :after undo-fu
     :straight t
-    :custom ((evil-move-beyond-eol . t)
-             (evil-cross-lines . t)
+    :custom ((evil-cross-lines . t)
              (evil-respect-visual-line-mode . t)
              (evil-want-fine-undo . t)
              (evil-normal-state-cursor quote box)
@@ -226,7 +210,8 @@
              (exec-path-from-shell-warn-duration-millis . 2000))
     :config
     (exec-path-from-shell-copy-envs
-     '("PATH" "CXX_COMPILER" "CXX_COMMON_OPTIONS" "CXX_DEBUG_OPTIONS" "CXX_RELEASE_OPTIONS")))
+     '("PATH" "CXX_COMPILER" "CXX_COMMON_OPTIONS" "CXX_DEBUG_OPTIONS" "CXX_RELEASE_OPTIONS"))
+    :require t)
 
   (leaf fontaine
     :doc "Set font configurations using presets"
@@ -265,18 +250,27 @@
     :custom (key-chord-two-keys-delay . 0.2)
     :global-minor-mode t)
 
-  (leaf kind-icon
-    :doc "Completion kind icons"
-    :req "emacs-27.1" "svg-lib-0.2.8"
-    :tag "convenience" "completion" "emacs>=27.1"
-    :url "https://github.com/jdtsmith/kind-icon"
-    :added "2024-03-20"
-    :emacs>= 27.1
-    :straight t
-    :after corfu
-    :custom ((kind-icon-default-face quote corfu-default))
-    :config
-    (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
+  (leaf lsp-bridge
+    :tag "out-of-MELPA"
+    :added "2024-03-23"
+    :straight (lsp-bridge :type git :host github :repo "manateelazycat/lsp-bridge" :files
+                          (:defaults "*.el" "*.py" "acm" "core" "langserver" "multiserver" "resources")
+                          :build
+                          (:not compile))
+    :after yasnippet
+    :init
+    (global-lsp-bridge-mode)
+    :custom ((lsp-bridge-python-multi-lsp-server . "pyright_ruff")
+             (lsp-bridge-enable-completion-in-string . t)
+             (lsp-bridge-enable-inlay-hint . t)
+             (lsp-bridge-enable-org-babel . t)
+             (acm-enable-icon . t)
+             (acm-enable-copilot)
+             (acm-enable-preview . t)
+             (acm-enable-yas)
+             (acm-enable-tempel)
+             (acm-backend-search-file-words)
+             (acm-backend-lsp-enable-auto-import)))
 
   (leaf magit
     :doc "A Git porcelain inside Emacs"
@@ -371,14 +365,11 @@
              (completion-category-defaults)
              (completion-category-overrides)))
 
-  (leaf projectile
-    :doc "Manage and navigate projects in Emacs easily"
-    :req "emacs-25.1"
-    :tag "convenience" "project" "emacs>=25.1"
-    :url "https://github.com/bbatsov/projectile"
-    :added "2024-03-20"
-    :emacs>= 25.1
+  (leaf perfect-margin
+    :tag "out-of-MELPA"
+    :added "2024-03-24"
     :straight t
+    :custom ((perfect-margin-only-set-left-margin . t))
     :global-minor-mode t)
 
   (leaf recentf
@@ -412,15 +403,6 @@
     :straight t
     :custom (smooth-scroll/vscroll-step-size . 10)
     :global-minor-mode smooth-scroll-mode)
-
-  (leaf tempel
-    :doc "Tempo templates/snippets with in-buffer field editing"
-    :req "emacs-27.1" "compat-29.1.4.4"
-    :tag "text" "tools" "languages" "abbrev" "emacs>=27.1"
-    :url "https://github.com/minad/tempel"
-    :added "2024-03-20"
-    :emacs>= 27.1
-    :straight t)
 
   (leaf treemacs
     :doc "A tree style file explorer package"
@@ -467,6 +449,38 @@
     :require t
     :straight t)
 
+  (leaf treesit
+    :doc "tree-sitter utilities"
+    :tag "builtin" "languages" "tree-sitter" "treesit"
+    :added "2024-03-23"
+    :custom ((treesit-font-lock-level . 4)))
+
+  (leaf treesit-auto
+    :straight t
+    :custom ((treesit-auto-install quote prompt)
+             (treesit-auto-add-to-auto-mode-alist quote all))
+    :global-minor-mode global-treesit-auto-mode)
+
+  (leaf undo-fu
+    :doc "Undo helper with redo"
+    :req "emacs-25.1"
+    :tag "emacs>=25.1"
+    :url "https://codeberg.org/ideasman42/emacs-undo-fu"
+    :added "2024-03-24"
+    :emacs>= 25.1
+    :straight t
+    :require t)
+
+  (leaf undo-fu-session
+    :doc "Persistent undo, available between sessions"
+    :req "emacs-28.1"
+    :tag "convenience" "emacs>=28.1"
+    :url "https://codeberg.com/ideasman42/emacs-undo-fu-session"
+    :added "2024-03-24"
+    :emacs>= 28.1
+    :straight t
+    :global-minor-mode undo-fu-session-global-mode)
+
   (leaf vertico
     :doc "VERTical Interactive COmpletion"
     :req "emacs-27.1" "compat-29.1.4.4"
@@ -488,6 +502,7 @@
     :require t
     :straight t
     :custom ((vterm-max-scrollback . 10000)
+             (vterm-timer-delay . 0.01)
              (vterm-buffer-name-string . "vterm %s")))
 
   (leaf vterm-toggle
@@ -528,7 +543,17 @@
     :added "2024-03-20"
     :emacs>= 24.4
     :straight t
-    :global-minor-mode t))
+    :global-minor-mode t)
+
+  (leaf yasnippet
+    :doc "Yet another snippet extension for Emacs"
+    :req "cl-lib-0.5" "emacs-24.4"
+    :tag "emulation" "convenience" "emacs>=24.4"
+    :url "http://github.com/joaotavora/yasnippet"
+    :added "2024-03-23"
+    :emacs>= 24.4
+    :straight t
+    :require t))
 
 
 

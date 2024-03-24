@@ -62,6 +62,11 @@
     (inhibit-startup-screen . t)
     (inhibit-startup-message . t)
     (inhibit-startup-echo-area-message . t))
+  (leaf whitespace
+    :config
+    (setq-default show-trailing-whitespace t))
+  (leaf performance
+    :custom ((vs-handled-backends '(Git))))
   (leaf edit
     :custom
     (indent-tabs-mode . nil)
@@ -110,9 +115,8 @@
       "hv" '(describe-variable :which-key "describe variable")
       "hm" '(describe-keymap :which-key "describe map")
       "p" '(:ignore t :which-key "Project")
-      "pp" '(projectile-switch-project :which-key "switch project")
-      "pf" '(projectile-find-file :which-key "find file in project")
-      "pr" '(projectile-recentf :which-key "recent file in project")
+      "pp" '(project-switch-project :which-key "switch project")
+      "pf" '(project-find-file :which-key "find file in project")
       "q" '(:ignore t :which-key "Quit")
       "qr" '(restart-emacs :which-key "restart emacs")
       "qq" '(evil-quit :which-key "quit")
@@ -169,40 +173,31 @@
       "l" 'evil-avy-goto-line))
 
   (leaf insert-keymap
-    :init
-    (defun my/copilot-tab ()
-      (interactive)
-      (or (copilot-accept-completion)
-          (indent-for-tab-command)))
     :config
     (key-chord-define evil-insert-state-map "jj" 'evil-normal-state)
     (general-imap
       "C-S-k" 'kill-whole-line
       "C-e" 'mwim-end-of-code-or-line
       "C-a" 'mwim-beginning-of-code-or-line
-      "<tab>" 'my/copilot-tab
-      "TAB" 'my/copilot-tab)
+      "C-<tab>" 'my/copilot-tab
+      "C-TAB" 'my/copilot-tab)
     (general-imap
       :keymaps 'vterm-mode-map
       "TAB" 'vterm-send-tab
       "<tab>" 'vterm-send-tab))
-  
+
   (leaf global-keymap
-    :config 
+    :config
     (general-define-key
      "M-x" 'execute-extended-command
-     "M-t" 'evil-goto-definition
-     "M-a" 'embark-act
-     "M-e" 'embark-dwim
      "C-x C-c" 'server-edit
-     "C-<tab>" 'centaur-tabs-forward
-     "C-TAB" 'centaur-tabs-forward
-     "C-S-<tab>" 'centaur-tabs-backward
-     "C-S-TAB" 'centaur-tabs-backward)
+     "M-a" 'embark-act)
     (general-define-key
-     :keymaps 'corfu-mode-map
-     "C-j" 'corfu-next
-     "C-k" 'corfu-previous)
+     :keymaps 'lsp-bridge-mode-map
+     "M-t" 'lsp-bridge-find-def
+     "M-h" 'lsp-bridge-find-def-return
+     "<f2>" 'lsp-bridge-rename
+     "M-r" 'lsp-bridge-rename)
     (general-define-key
      :keymaps 'dired-mode-map
      "SPC" nil)
@@ -212,6 +207,15 @@
      "j" 'vundo-next
      "k" 'vundo-previous
      "l" 'vundo-forward)
+    (general-define-key
+     :keymaps 'acm-mode-map
+     "C-j" 'acm-select-next
+     "C-k" 'acm-select-prev
+     "TAB" 'acm-select-next
+     "<tab>" 'acm-select-next
+     "S-TAB" 'acm-select-prev
+     "<backtab>" 'acm-select-prev
+     "<iso-lefttab>" 'acm-select-prev)
     (general-define-key
      :keymaps 'vertico-map
      "C-j" 'vertico-next
